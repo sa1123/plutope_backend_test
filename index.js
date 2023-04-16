@@ -1,20 +1,23 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const cors = require('cors')
+
+const db = require('./db')
+const movieRouter = require('./routes/movie-router')
+
 const app = express()
+const apiPort = 8000
 
-app.use(express.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
-const PORT = 8080
-app.listen(PORT, () => {
-    console.log(`Server is running on PORT ${PORT}...`)
+app.use(bodyParser.json())
+
+db.on('error', console.error.bind(console, 'MongoDB connection error:'))
+
+app.get('/', (req, res) => {
+    res.send('Hello World!')
 })
 
-const mongoose = require('mongoose')
+app.use('/api', movieRouter)
 
-const DB = 'mongodb+srv://chels:chels@cluster0.pb1jkzb.mongodb.net/?retryWrites=true&w=majority'
-mongoose.connect(DB, {
-    useNewUrlParser: true,
-     useUnifiedTopology: true,
-}).then(() =>{
-    console.log('Database connected..')
-})
+app.listen(apiPort, () => console.log(`Server running on port ${apiPort}`))
